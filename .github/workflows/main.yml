@@ -13,7 +13,7 @@ jobs:
 
   Build-job:
     runs-on: ubuntu-latest
-    depends-on: Test-job
+    needs: Test-job
     steps:
 
      - name: checkout code

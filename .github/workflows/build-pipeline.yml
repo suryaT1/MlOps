@@ -1,0 +1,33 @@
+name: CI - Build & Push Image
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  docker-build-push:
+    runs-on: ubuntu-latest
+    environment: Testing
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} |
+          docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+
+      - name: Build Docker image
+        run: docker build -t cat-dog-api:latest .
+
+      - name: Tag & Push image
+        run: |
+          docker tag cat-dog-api:latest ${{ secrets.ECR_REPO }}:classv1
+          docker push ${{ secrets.ECR_REPO }}:classv1

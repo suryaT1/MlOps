@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   train:
-    Environment: Testing
+    environment: Testing
     runs-on: ubuntu-latest
 
     steps:

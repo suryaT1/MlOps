@@ -1,6 +1,6 @@
 fastapi
 uvicorn
-tensorflow
-pillow
+tensorflow-cpu
 numpy
-
+pillow
+boto3

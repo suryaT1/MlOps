@@ -9,13 +9,22 @@ from sklearn.pipeline import Pipeline
 os.makedirs("model", exist_ok=True)
 
 df = pd.read_csv("data/telecom_churn.csv")
-df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
 
+# Fix target safely
+if df["Churn"].dtype == object:
+    df["Churn"] = df["Churn"].map({"Yes": 1, "No": 0})
+
+# Separate features & target
 X = df.drop("Churn", axis=1)
 y = df["Churn"]
 
+# Defensive check (VERY important)
+assert y.isna().sum() == 0, "Target y contains NaN values"
+
+# One-hot encode (if needed)
 X = pd.get_dummies(X, drop_first=True)
 
+# Split
 X_train, X_val, y_train, y_val = train_test_split(
     X, y, test_size=0.2, random_state=42
 )

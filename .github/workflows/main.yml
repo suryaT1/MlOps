@@ -84,7 +84,7 @@ jobs:
           docker run -d --name iris-test -p 8000:8000 mlops-iris:test
           sleep 10
 
-            - name: Test API with curl
+      - name: Test API with curl
         run: |
           curl -f http://localhost:8000/
           curl -f -X POST http://localhost:8000/predict \

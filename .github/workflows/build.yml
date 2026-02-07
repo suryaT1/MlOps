@@ -9,7 +9,6 @@ permissions:
 
 jobs:
   train:
-    environment: Testing
     runs-on: ubuntu-latest
 
     steps:
@@ -35,6 +34,7 @@ jobs:
   docker:
     needs: train
     runs-on: ubuntu-latest
+    environment: Testing
 
     steps:
       - uses: actions/checkout@v4

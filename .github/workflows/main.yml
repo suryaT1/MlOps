@@ -32,4 +32,10 @@ jobs:
        run: |
         python train.py
 
+     - name: Upload trained model
+       uses: actions/upload-artifact@v4
+       with:
+          name: iris-model
+          path: model/
+
       

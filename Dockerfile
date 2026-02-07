@@ -1,39 +1,15 @@
-FROM python:3.9-slim AS builder
+FROM python:3.10-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 WORKDIR /app
-
-# System dependencies required for TensorFlow wheels
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-RUN python -m pip install --upgrade pip \
-    && python -m pip install --no-cache-dir --prefix=/install -r requirements.txt
-
-
-# ---- Final stage ----
-FROM python:3.9-slim
-
-WORKDIR /app
-
-# Runtime libs only (no compiler)
-RUN apt-get update && apt-get install -y \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender1 \
-    && rm -rf /var/lib/apt/lists/*
-
-# Copy installed Python packages from builder
-COPY --from=builder /install /usr/local
-
-COPY . .
+COPY app.py .
+COPY cat_dog_model.keras .
 
 EXPOSE 8000
 

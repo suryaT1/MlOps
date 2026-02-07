@@ -2,7 +2,7 @@ name: CI - Build & Push Image
 
 on:
   push:
-    branches: [ master ]
+    branches: [ image_classification ]
 
 jobs:
   docker-build-push:

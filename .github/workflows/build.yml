@@ -8,8 +8,9 @@ permissions:
   contents: write
 
 jobs:
-  train:
+  train-build-push:
     runs-on: ubuntu-latest
+    environment: Testing
 
     steps:
       - uses: actions/checkout@v4
@@ -18,7 +19,8 @@ jobs:
         with:
           python-version: "3.10"
 
-      - run: pip install -r requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
 
       - name: Train churn model
         run: python train.py
@@ -30,14 +32,6 @@ jobs:
           git add model/
           git diff --cached --quiet || git commit -m "ci: update churn model"
           git push
-
-  docker:
-    needs: train
-    runs-on: ubuntu-latest
-    environment: Testing
-
-    steps:
-      - uses: actions/checkout@v4
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4

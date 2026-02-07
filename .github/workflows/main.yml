@@ -48,4 +48,37 @@ jobs:
           git diff --cached --quiet || git commit -m "ci: update trained model"
 
           git push
+
+  docker-test:
+    needs: Build-job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t mlops-iris:test .
+
+      - name: Run container
+        run: |
+          docker run -d \
+            --name iris-test \
+            -p 8000:8000 \
+            mlops-iris:test
+
+      - name: Wait for API
+        run: sleep 10
+
+      - name: Test API with curl
+        run: |
+          curl -f http://localhost:8000/
+          curl -f -X POST http://localhost:8000/predict \
+            -H "Content-Type: application/json" \
+            -d '{"features":[5.1,3.5,1.4,0.2]}'
+
+      - name: Cleanup container
+        run: |
+          docker stop iris-test
+          docker rm iris-test   
       

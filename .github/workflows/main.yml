@@ -2,7 +2,7 @@ name: MLOps CI Docker ECR Pipeline
 
 on:
   push:
-    branches: [ master ]
+    branches: [ test ]
     paths-ignore:
       - "model/**"
 

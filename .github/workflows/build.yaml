@@ -7,9 +7,8 @@ on:
 
 jobs:
   train-test-build:
-  environment: Testing
+    environment: Testing
     runs-on: ubuntu-latest
-    
     steps:
       - uses: actions/checkout@v4
 

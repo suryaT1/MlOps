@@ -1,37 +1,42 @@
-name: Hello world
+name: MLOps CI Docker ECR Pipeline
 
 on:
-  push
+  push:
+    branches: [ main ]
+    paths-ignore:
+      - "model/**"
+
+permissions:
+  contents: write
 
 jobs:
-  Test-job:
+  test:
     runs-on: ubuntu-latest
 
     steps:
-     - name: Hello world
-       run: "echo world"
+      - name: Hello world
+        run: echo "world"
 
-  Build-job:
+  build-train:
+    needs: test
     runs-on: ubuntu-latest
-    needs: Test-job
+
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-     - name: checkout code
-       uses: actions/checkout@v4
-
-     - name: Set up Python
-       uses: actions/setup-python@v5
-       with:
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
           python-version: "3.10"
 
-     - name: Installing dependencies
-       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-     - name: Training the model
-       run: |
-        python train.py
+      - name: Train model
+        run: python train.py
 
     #  - name: Upload trained model
     #    uses: actions/upload-artifact@v4
@@ -39,18 +44,17 @@ jobs:
     #       name: iris-model
     #       path: model/
 
-     - name: Commit trained model
-       run: |
+      - name: Commit trained model
+        run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
           git add model/
           git diff --cached --quiet || git commit -m "ci: update trained model"
-
           git push
 
-  docker-test:
-    needs: Build-job
+  docker-test-push:
+    needs: build-train
     runs-on: ubuntu-latest
     environment: Testing
 
@@ -63,21 +67,15 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }} 
-      
-      - name: Build Docker image
-        run: docker build -t mlops-iris:test .
-     
+          aws-region: ${{ secrets.AWS_REGION }}
+
       - name: Login to ECR
         run: |
-          aws ecr get-login-password \
-          | docker login \
-            --username AWS \
-            --password-stdin ${{ secrets.ECR_REPO }}
+          aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
+          | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
 
       - name: Build Docker image
-        run: |
-          docker build -t mlops-iris:test .
+        run: docker build -t mlops-iris:test .
 
       - name: Run container for testing
         run: |
@@ -91,5 +89,5 @@ jobs:
 
       - name: Tag & Push image to ECR
         run: |
-          docker tag mlops-iris:test ${{ secrets.ECR_REPO }}:latest
-          docker push ${{ secrets.ECR_REPO }}:latest
+          docker tag mlops-iris:test ${{ secrets.ECR_REPO }}:v1
+          docker push ${{ secrets.ECR_REPO }}:v1

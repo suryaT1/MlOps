@@ -1,0 +1,57 @@
+name: Churn MLOps Pipeline
+
+on:
+  push:
+    branches: [ customer_churn ]
+
+permissions:
+  contents: write
+
+jobs:
+  train:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - run: pip install -r requirements.txt
+
+      - name: Train churn model
+        run: python train.py
+
+      - name: Commit trained model
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add model/
+          git diff --cached --quiet || git commit -m "ci: update churn model"
+          git push
+
+  docker:
+    needs: train
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Login to ECR
+        run: |
+          aws ecr get-login-password |
+          docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
+
+      - name: Build & push Docker image
+        run: |
+          docker build -t churn-api .
+          docker tag churn-api ${{ secrets.ECR_REPO }}:latest
+          docker push ${{ secrets.ECR_REPO }}:latest

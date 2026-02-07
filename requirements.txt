@@ -4,3 +4,4 @@ tensorflow-cpu
 numpy
 pillow
 boto3
+python-multipart

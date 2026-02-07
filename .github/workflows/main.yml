@@ -32,10 +32,19 @@ jobs:
        run: |
         python train.py
 
-     - name: Upload trained model
-       uses: actions/upload-artifact@v4
-       with:
-          name: iris-model
-          path: model/
+    #  - name: Upload trained model
+    #    uses: actions/upload-artifact@v4
+    #    with:
+    #       name: iris-model
+    #       path: model/
 
+     - name: Commit trained model
+       run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add model/
+          git diff --cached --quiet || git commit -m "ci: update trained model"
+
+          git push
       

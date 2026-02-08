@@ -24,7 +24,7 @@ Each project is maintained in a **separate branch** and follows real-world MLOps
 
 ## 1️⃣ Iris Classification (Feature-based Prediction)
 
-**Branch:** `iris-mlops`
+**Branch:** `iris_model`
 
 ### 📌 Problem
 Predict the Iris flower species based on sepal and petal measurements.
@@ -50,7 +50,7 @@ Predict the Iris flower species based on sepal and petal measurements.
 
 ## 2️⃣ Cat vs Dog Image Classification
 
-**Branch:** `cat-dog-mlops`
+**Branch:** `image_classification`
 
 ### 📌 Problem
 Classify an image as either **Cat** or **Dog**.

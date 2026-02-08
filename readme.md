@@ -16,8 +16,8 @@ Each project is maintained in a **separate branch** and follows real-world MLOps
 
 | Project | Description | Branch |
 |------|------------|--------|
-| 🌸 Iris Prediction | Feature-based ML classification with CI/CD | `iris-mlops` |
-| 🐶🐱 Cat vs Dog | Image classification using CNN | `cat-dog-mlops` |
+| 🌸 Iris Prediction | Feature-based ML classification with CI/CD | `iris_model` |
+| 🐶🐱 Cat vs Dog | Image classification using CNN | `image_classification` |
 | 📉 Customer Churn | Continuous retraining-ready churn prediction system | `customer_churn` |
 
 ---
